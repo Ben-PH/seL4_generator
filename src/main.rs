@@ -1,11 +1,13 @@
 mod parser;
 extern crate pest_derive;
-use quote::*;
-use syn::{export::TokenStream2};
 
 
+mod generator;
 
 fn main() {
-    let gend = parser::parse();
-    dbg!(gend);
+    let parsed = parser::parse();
+    let generated = generator::gen(parsed);
+
+    std::fs::write("generated.rs", generated.to_string()).unwrap();
 }
+

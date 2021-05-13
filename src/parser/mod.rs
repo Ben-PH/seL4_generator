@@ -1,5 +1,4 @@
 extern crate pest;
-#[macro_use]
 use pest_derive::*;
 
 use pest::iterators::Pair;
@@ -25,7 +24,7 @@ fn parse_block_content(pair: Pair<Rule>, st: &mut Generated) {
         match p.as_rule() {
             Rule::field => parse_field(p, st),
             Rule::padding => parse_padding(p, st),
-            _ => {}
+            all => eprintln!("in parse block: {:?}", all),
         }
     }
 }
@@ -37,9 +36,9 @@ fn parse_block(pair: Pair<Rule>) -> Generated {
     };
     for p in pair.into_inner() {
         match p.as_rule() {
-            Rule::ident => {gen.name = p.as_str().to_string();}
+            Rule::ident => {gen.name = p.as_str().trim_start_matches("seL4_").to_string();}
             Rule::block_content => parse_block_content(p, &mut gen),
-            all => println!("in parse block: {:?}", all),
+            all => eprintln!("in parse block: {:?}", all),
         }
     }
     gen
@@ -66,15 +65,11 @@ pub fn parse() -> Vec<Generated> {
     for pair in pairs {
         // A pair can be converted to an iterator of the tokens which make it up:
         match pair.as_rule() {
-            Rule::base => {
-                print!("base = ");
-                println!("{}", pair.clone().into_inner().as_str());
-            },
-
+            Rule::base => {},
             Rule::block => {
                 vecs.push(parse_block(pair));
             }
-            _ => println!("{:#?}", pair),
+            _ => eprintln!("{:#?}", pair),
         }
 
     }

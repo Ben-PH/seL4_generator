@@ -1,0 +1,12 @@
+WHITESPACE = _{ " " |  "\t" }
+base_bits = {"32" | "64" }
+base = { "base"  ~ base_bits}
+comment = _{ "--" ~ (ASCII_ALPHANUMERIC | PUNCTUATION)* }
+ident = ${ ASCII_ALPHA ~ (ASCII_ALPHANUMERIC | "_")* }
+field = { "field" ~ ident ~ number ~ NEWLINE+ }
+block_content = {(padding | field)*}
+number = {ASCII_DIGIT+}
+padding = { "padding" ~ number ~ NEWLINE+}
+block = { "block" ~ ident ~ "{" ~ NEWLINE ~ block_content ~ "}" }
+parser_line = _{ WHITESPACE* ~ (base | comment | block) }
+parser = _{ (parser_line ~ NEWLINE+)* ~ parser_line}
